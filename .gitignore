@@ -32,3 +32,4 @@ manga_storn-*.tar
 npm-debug.log
 /assets/node_modules/
 
+/data/

@@ -1,14 +1,43 @@
 version: "3"
 services:
-  db:
-    image: postgres
-    restart: always
-    environment:
-      POSTGRES_PASSWORD: postgres
+  postgres:
+    image: postgres:13.4
+    build:
+      context: ./docker/postgres/
+      dockerfile: Dockerfile
+    container_name: "postgres"
+    command:
+      - postgres
+      - -c
+      - config_file=postgresql.conf
     ports:
       - 5432:5432
-  adminer:
-    image: adminer
-    restart: always
+    environment:
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+  rabbitmq:
+    image: rabbitmq:management
+    hostname: manga-storn
+    container_name: "rabbitmq"
     ports:
-      - 8080:8080
+      - 5672:5672
+      - 15672:15672
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq/
+      - rabbitmq-log:/var/log/rabbitmq
+  fakes3:
+    build:
+      context: ./docker/fakes3
+    image: fakes3
+    container_name: fakes3
+    ports:
+      - 4567:4567
+    volumes:
+      - fakes3-data:/fakes3_data
+
+volumes:
+  postgres-data:
+  rabbitmq-data:
+  rabbitmq-log:
+  fakes3-data:
